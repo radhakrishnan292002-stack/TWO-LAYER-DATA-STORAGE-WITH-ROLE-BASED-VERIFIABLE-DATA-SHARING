@@ -1,0 +1,237 @@
+from flask import Flask, render_template, request, flash, session
+import mysql.connector
+import random
+import os
+
+app = Flask(__name__)
+app.secret_key = "secretkey"
+
+
+# ------------------ BASIC PAGES ------------------
+
+@app.route('/NewUser')
+def NewUser():
+    return render_template('NewUser.html')
+
+
+@app.route('/TALogin')
+def TALogin():
+    return render_template('TALogin.html')
+
+
+# ------------------ SERVER LOGIN ------------------
+
+@app.route("/serverlogin", methods=['GET', 'POST'])
+def serverlogin():
+    if request.method == 'POST':
+        if request.form['uname'] == 'server' and request.form['password'] == 'server':
+
+            conn = mysql.connector.connect(
+                user='root',
+                password='',
+                host='localhost',
+                database='1rolebasedclouddb'
+            )
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM ownertb")
+            data = cur.fetchall()
+            conn.close()
+
+            return render_template('ServerHome.html', data=data)
+        else:
+            flash('Username or Password is wrong')
+
+    return render_template('ServerLogin.html')
+
+
+@app.route("/fserverlogin", methods=['GET', 'POST'])
+def fserverlogin():
+    if request.method == 'POST':
+        if request.form['uname'] == 'server' and request.form['password'] == 'server':
+
+            conn = mysql.connector.connect(
+                user='root',
+                password='',
+                host='localhost',
+                database='1rolebasedclouddb'
+            )
+            cur = conn.cursor()
+            cur.execute("SELECT * FROM filetb")
+            data = cur.fetchall()
+            conn.close()
+
+            return render_template('CloudServerHome.html', data=data)
+        else:
+            flash('Username or Password is wrong')
+
+    return render_template('CloudServerLogin.html')
+
+
+# ------------------ SERVER INFO ------------------
+
+@app.route('/SUserInfo')
+def SUserInfo():
+    conn = mysql.connector.connect(
+        user='root',
+        password='',
+        host='localhost',
+        database='1rolebasedclouddb'
+    )
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM regtb")
+    data = cur.fetchall()
+    conn.close()
+
+    return render_template('SUserInfo.html', data=data)
+
+
+@app.route('/SFileInfo')
+def SFileInfo():
+    conn = mysql.connector.connect(
+        user='root',
+        password='',
+        host='localhost',
+        database='1rolebasedclouddb'
+    )
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM filetb")
+    data1 = cur.fetchall()
+    conn.close()
+
+    return render_template('SFileInfo.html', data=data1)
+
+
+# ------------------ APPROVE OWNER ------------------
+
+@app.route("/Approved")
+def Approved():
+    id = request.args.get('lid')
+    email = request.args.get('email')
+
+    loginkey = random.randint(1111, 9999)
+    message = "Owner Login Key : " + str(loginkey)
+
+    sendmail(email, message)
+
+    conn = mysql.connector.connect(
+        user='root',
+        password='',
+        host='localhost',
+        database='1rolebasedclouddb'
+    )
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE ownertb SET Status='Active', LoginKey=%s WHERE id=%s",
+        (str(loginkey), id)
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM ownertb WHERE status='waiting'")
+    data = cursor.fetchall()
+    conn.close()
+
+    return render_template('ServerHome.html', data=data)
+
+
+# ------------------ NEW OWNER REGISTRATION ------------------
+
+@app.route("/newowner", methods=['GET', 'POST'])
+def newowner():
+    if request.method == 'POST':
+        uname = request.form['uname']
+        mobile = request.form['mobile']
+        email = request.form['email']
+        address = request.form['address']
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = mysql.connector.connect(
+            user='root',
+            password='',
+            host='localhost',
+            database='1rolebasedclouddb'
+        )
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM ownertb WHERE username=%s", (username,))
+        data = cursor.fetchone()
+
+        if data is None:
+            cursor.execute(
+                """INSERT INTO ownertb 
+                VALUES ('', %s, %s, %s, %s, %s, %s, 'waiting', '')""",
+                (uname, mobile, email, address, username, password)
+            )
+            conn.commit()
+            flash('Record Saved!')
+        else:
+            flash('Already Registered Username!')
+
+        conn.close()
+
+    return render_template('NewOwner.html')
+
+
+# ------------------ OWNER LOGIN ------------------
+
+@app.route("/ownerlogin", methods=['GET', 'POST'])
+def ownerlogin():
+    if request.method == 'POST':
+        username = request.form['uname']
+        password = request.form['password']
+        loginkey = request.form['loginkey']
+
+        session['oname'] = username
+
+        conn = mysql.connector.connect(
+            user='root',
+            password='',
+            host='localhost',
+            database='1rolebasedclouddb'
+        )
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM ownertb WHERE username=%s AND password=%s",
+            (username, password)
+        )
+        data = cursor.fetchone()
+        conn.close()
+
+        if data is None:
+            flash('Username or Password is wrong')
+            return render_template('OwnerLogin.html')
+
+        status = data[7]
+        lkey = data[8]
+
+        if status == "waiting":
+            flash('Waiting For Server Approval!')
+            return render_template('OwnerLogin.html')
+
+        if str(lkey) == loginkey:
+            return redirect('/OwnerHome')
+        else:
+            flash('Login Key Incorrect')
+            return render_template('OwnerLogin.html')
+
+    return render_template('OwnerLogin.html')
+
+
+# ------------------ OWNER HOME ------------------
+
+@app.route('/OwnerHome')
+def OwnerHome():
+    conn = mysql.connector.connect(
+        user='root',
+        password='',
+        host='localhost',
+        database='1rolebasedclouddb'
+    )
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT * FROM ownertb WHERE username=%s",
+        (session['oname'],)
+    )
+    data1 = cur.fetchall()
+    conn.close()
+
+    return render_template('OwnerHome.html', data=data1)
