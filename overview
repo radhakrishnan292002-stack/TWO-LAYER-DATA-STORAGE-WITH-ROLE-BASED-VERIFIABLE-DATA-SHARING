@@ -1,0 +1,21 @@
+EXISTING SYSTEM 
+The proposed dynamic secure access control using the blockchain (DSA-Block) model focuses on secure access control and secure data sharing using blockchain.1) Authentication of nodes and users is carried out via hyper elliptic curve cryptography (HECC) and the entities are stored in the private local ledger (LL) to enhance the security, which helps to mitigate external attacks. Authentication-based request filtering is performed through a GW by verifying the legitimacy with a timestamp and freshness of the requests, which increases throughput and reduces latency. Access delegation is achieved through the edge server using rock hyraxes swarm optimization (RHSO) by considering trust, energy, load, and resource availability (RA), in which the trust value is evaluated using blockchain, which reduces the block validation time,response time, and consensus time. The data are shared securely manner by uploading the data to the cloud server with the help of a differential privacy mechanism, which increases the attack detection rate. Finally, revocation is performed for both user attributes and users to enhance security. The user attributes revocation is performed by considering expiry time and attributes updating, and user revocation is performed based on the trust value, which also increases the attack detection rate. 
+
+
+DISADVANTAGES  
+•	This is limited to a single delegator node section, which means block validation takes more time. 
+•	When the number of delegator nodes increases, the time consumption for the consensus also increases. 
+•	This system may not easily adapt to blockchain integration.
+•	It is leading to higher implementation costs and potential disruptions during the transition. 
+•	Managing cryptographic keys securely, especially in a large-scale IoT environment,can be challenging.  
+
+
+PROPOSED SYSTEM 
+To enable data sharing in the Cloud, it is essential that only authorised users are able to get access to data stored in the Cloud. Proposed work focused on Secure Group Sharing in Cloud with Blockchain technology. When the data owner wants to share their own data to a group, he/she sends the key used for data encryption to each member of the group. Any of the group members can then get the encrypted data from the Cloud and decrypt the data using the key and hence group member does not require the interference of the data owner. Proposed work designed decentralized blockchain based EHRs with ECC encryption scheme. In their scheme, each authority is in charge of accessing data using their Role. That is to say, the different roles of the user are issued to more authority based on their roles. It is a hybrid cloud architecture comprising a private cloud which is used to store sensitive role hierarchy of the hospital and patient memberships, and a public cloud storing the encrypted data and public 
+parameters associated with the Role based access control with encryption system. The users who wish to access the encrypted data and the data owners who wish to encrypt their data only interact with the public cloud. The role hierarchy and user to role mappings related to the organization are maintained in the private cloud which is only accessible to the administrator of the hospital system. The administrator specifies the role hierarchy and the role managers who manage the user membership relations. Also implement secure user revocation process with key update system. When a user removed from existing group, group key gets updated is distributed to all users present in current data access pattern. Furthermore, all these approaches make it difficult to assign subsets of privileges of an administrator.  
+
+ADVANTAGES  
+•	Only one user with a satisfied attribute set with their role can access the data. S
+•	Shared group key together with user’s roles, determines whether the user satisfies the policy. 
+•	Resolve problem of data modification using block chain technology. 
+•	With the help of ECC algorithm key generation and distribution process are implemented in easy and secure way.
