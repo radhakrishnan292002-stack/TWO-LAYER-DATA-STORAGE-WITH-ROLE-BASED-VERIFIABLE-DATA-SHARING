@@ -1,0 +1,68 @@
+HARDWARE REQUIREMENTS 
+•	Processor : Intel core processor 2.6.0 GHZ 
+•	RAM : 4 GB 
+•	Hard disk : 320 GB 
+•	Compact Disk : 650 Mb 
+•	Keyboard : Standard keyboard 
+•	Monitor : 15 inch color monitor
+
+
+SOFTWARE REQUIREMENTS 
+•	Operating system : Windows OS 
+•	Language : Python 
+•	Database : MySQL 
+•	IDLE : Python 2.7 IDLE
+
+SYSTEM ENVIRONMENT 
+1. PYTHON 
+Python is an interpreted high-level programming language for general-purpose programming. Created by Guido van Rossum and first released in 1991, Python has a design philosophy that emphasizes code readability, notably using significant whitespace. It provides constructs that enable clear programming on both small and large scales. In July 2018, Van Rossum stepped down as the leader in the language community. Python features a dynamic type system and automatic memory management. It supports multiple programming paradigms, including object-oriented, imperative, functional and procedural, and has a large and comprehensive standard library. Python interpreters are available for many operating systems. CPython, the reference implementation of Python, is open source software and has a community-based development model, as do nearly all of Python's other implementations.Python and CPython are managed by the non-profit Python Software Foundation. Rather than having all of its functionality built into its core, Python was designed to be highly extensible.This compact modularity has made it particularly popular as a means of adding programmable interfaces to existing applications. Van Rossum's vision of a small core language with a large standard library and easily extensible interpreter stemmed from his frustrations with ABC,which espoused the opposite approach. While offering choice in coding methodology, the Python philosophy rejects exuberant syntax (such as that of Perl) in favor of a simpler, less-cluttered grammar. As Alex Martelli put it: "To describe something as 'clever' is not considered a compliment in the Python culture."Python's philosophy rejects the Perl "there is more than one way to do it" approach to language design in favour of "there should be one—and preferably only one—obvious way to do it".
+
+2. MY SQL 
+MySQL is the world's most used open source relational database management system (RDBMS) as of 2008 that run as a server providing multi-user access to a number of databases.The MySQL development project has made its source code available under the terms of the GNU General Public License, as well as under a variety of proprietary agreements. MySQL was owned and sponsored by a single for-profit firm, the Swedish company MySQL AB, now owned by Oracle Corporation.  
+MySQL is a popular choice of database for use in web applications, and is a central component of the widely used LAMP open source web application software stack—LAMP is an acronym for "Linux, Apache, MySQL, Perl/PHP/Python." Free-software-open source projects that require a full-featured database management system often use MySQL. 
+For commercial use, several paid editions are available, and offer additional functionality.Applications which use MySQL databases include: TYPO3, Joomla, Word Press, phpBB,MyBB, Drupal and other software built on the LAMP software stack. MySQL is also used in many high-profile, large-scale World Wide Web products, including Wikipedia,Google(though not for searches), ImagebookTwitter, Flickr, Nokia.com, and YouTube.
+
+
+Interimages 
+MySQL is primarily an RDBMS and ships with no GUI tools to administer MySQL databases or manage data contained within the databases. Users may use the included command line tools, or use MySQL "front-ends", desktop software and web applications that create and manage MySQL databases, build database structures, back up data, inspect status, and work with data records. The official set of MySQL front-end tools, MySQL Workbench is actively developed by Oracle, and is freely available for use.
+
+Graphical 
+The official MySQL Workbench is a free integrated environment developed by MySQL AB,that enables users to graphically administer MySQL databases and visually design database structures. MySQL Workbench replaces the previous package of software, MySQL GUI Tools.Similar to other third-party packages, but still considered the authoritative MySQL frontend, MySQL Workbench lets users manage database design & modeling, SQL development (replacing MySQL Query Browser) and Database administration (replacing MySQL Administrator).
+
+MySQL Workbench is available in two editions, the regular free and open source Community Edition which may be downloaded from the MySQL website, and the proprietary Standard Edition which extends and improves the feature set of the Community Edition.
+
+
+
+
+Command line 
+MySQL ships with some command line tools. Third-parties have also developed tools to manage a MySQL server, some listed below. 
+•	Maatkit - a cross-platform toolkit for MySQL, PostgreSQL and Memcached, developed in Perl Maatkit can be used to prove replication is working correctly, fix corrupted data,automate repetitive tasks, and speed up servers. Maatkit is included with several GNU/Linux distributions such as CentOS and Debian and packages are available for Programming 
+
+MySQL works on many different system platforms, including AIX, BSDi, FreeBSD, HP-UX,eComStation, i5/OS, IRIX, Linux, Mac OS X, Microsoft Windows, NetBSD, Novell NetWare,OpenBSD, OpenSolaris, OS/2 Warp, QNX, Solaris, Symbian, SunOS, SCO OpenServer, SCO UnixWare, Sanos and Tru64. A port of MySQL to OpenVMS also exists.[32] 
+
+Features 
+As of April 2009, MySQL offered MySQL 5.1 in two different variants: the open source MySQL Community Server and the commercial Enterprise Server. MySQL 5.5 is offered under the same licences. They have a common code base and include the following features: 
+•	A broad subset of ANSI SQL 99, as well as extensions 
+•	Cross-platform support 
+•	Stored procedures 
+•	Triggers 
+•	Cursors 
+•	Updatable Views
+•	Information schema
+•	Strict mode (ensures MySQL does not truncate or otherwise modify data to conform to an underlying data type, when an incompatible value is inserted into that type) 
+•	X/Open XAdistributed transaction processing (DTP) support; two phase commit as part of this, using Oracle's InnoDB engine 
+•	Independent storage engines (MyISAM for read speed, InnoDB for transactions and referential integrity, MySQL Archive for storing historical data in little space)
+•	Transactions with the InnoDB, and Cluster storage engines; savepoints with InnoDB 
+•	SSL support 
+•	Query caching 
+•	Sub-SELECTs (i.e. nested SELECTs) 
+•	Replication support (i.e. Master-Master Replication & Master-Slave Replication) with one master per slave, many slaves per master, no automatic support for multiple masters per slave. 
+•	Full-text indexing and searching using MyISAM engine 
+•	Embedded database library 
+•	Unicode support (however prior to UTF-8 and UCS-2 encoded strings are limited to the BMP, in  and later use utf8mb4 for full unicode support) 
+• ACID compliance when using transaction capable storage engines (InnoDB and 
+Cluster)  
+• Partititoned tables with pruning of partitions in optimiser 
+• Shared-nothing clustering through MySQL Cluster 
+• Hot backup (via mysqlhotcopy) under certain conditions 
+• Multiple storage engines, allowing one to choose the one that is most effective for each table in the application (in MySQL , storage engines must be compiled in; in MySQL ,storage engines can be dynamically loaded at run time): Native storage engines (MyISAM, Falcon, Merge, Memory (heap), Federated, Archive, CSV, Blackhole,Cluster, EXAMPLE, Maria, and InnoDB, which was made the default as of 5.5).Partner-developed storage engines (solidDB, NitroEDB, ScaleDB, TokuDB, Infobright (formerly Brighthouse), Kickfire, XtraDB, IBM DB2). InnoDB used to be a partner.
