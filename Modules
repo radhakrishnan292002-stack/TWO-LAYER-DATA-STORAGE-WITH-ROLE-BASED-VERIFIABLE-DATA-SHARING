@@ -1,0 +1,34 @@
+LIST OF MODULES 
+•	Interface Construction 
+•	Group Key Verification 
+•	Data Upload and Encryption 
+•	Role based access control 
+•	Data Access 
+•	User Revocation 
+
+MODULE DESCRIPTION 
+INTERFACE CONSTRUCTION 
+The storage scheme of medical data uses blockchain based cloud storage technology to achieve safe storage and sharing.In this module, create a local Cloud and provide priced abundant storage services. Data storage and access control are the main transactions in the medical blockchain. It would be optimal to be able to hold all medical data on the blockchain.Once get space from cloud the users can upload to share data in the cloud. In this work, the cloud storage can be implementing with high secure using block chain technology Proposed secure data sharing framework provides communication between group owner and group members. 
+
+
+Group Owner takes charge of followings,  
+1. System parameters generation 
+2. User registration 
+3. User revocation 
+Therefore, the group owner is fully trusted by the other parties. The Group owner is the admin The group owner has the logs of each and every process in the cloud. The group owner is responsible for user registration and also user revocation too.
+
+GROUP KEY VERIFICATION 
+ 	Group key defines the verification key shared using as the message passing interface that used to exchanging messages to multiple systems in a parallel processing. Here proposed a new approach to access cloud using login credential and group verification based secret key for secure access of cloud storage. PKG is responsible for generating secret key and use MPI for distribution of secret keys to the user. The secret key sharing based on message passing is the concept of group authentication and verification module in cloud security system. 
+
+ DATA UPLOAD AND ENCRYPTION 
+ 	DO is a cloud client who registers with the CSP (Cloud Service Provider).DO outsources data to cloud in encrypted form. DO anonymously get authenticated to cloud while getting duly authenticated. It is the duty of the DO to prevent the admission of malicious DO’s to cloud. The encrypted data is uploaded to the cloud by the Data Owner. The DO can encrypt the file using ECC encryption technique. The choice of encryption is of the DO.
+
+ROLE BASED ACCESS CONTROL 
+ 	RBAC is nothing more than the idea of assigning system access to users based on their role within an organization. The system needs of a given workforce are analyzed, with users grouped into roles based on common job responsibilities and system access needs.Access is then assigned to each person based strictly on their role assignment. With tight adherence to access requirements established for each role, access management becomes much easier.The Data User is provided with Role-based Access Control (RBAC) policy. In our proposed system, the privileges of the Data User are reduced and the DU can only download data from the cloud. In the proposed system, to protect the sensitive information the Data Owner specifies their own access privacy policies. Access can be restricted to certain information. Apart from this, it also helps the customer to increase his confidence and provides continuous data access with the touch of a button from anywhere at any time.
+
+DATA ACCESS 
+User must be authenticated to access the service from cloud. The commonly used security mechanism for data access is to check username and password pair. User provides the username and password to the cloud server and then cloud server checks the authenticity of user. If user is authorized service provider will allow user to search file from cloud otherwise the user will not allowed to search files. User can be extracting the stored data anywhere from cloud storage. If a new member is added to the group, this system can be granted access to the file and sharing the group key to the added member wherein he can directly download the decrypted data file, when they are downloading the file a secret key is generated and sent to their own mobile number, using that key user can download the data.
+
+
+USER REVOCATION 
+Once a user in the group is revoked, the cloud is able to resign the blocks, which were signed by the revoked user and intimate PKG to generate re-signing key. As a result, the efficiency of user revocation can be significantly improved, and computation and communication resources of existing users can be easily saved. Meanwhile, the cloud, which is not in the same trusted domain with each user, is only able to convert a signature of the revoked user into a signature of an existing user on the same block
