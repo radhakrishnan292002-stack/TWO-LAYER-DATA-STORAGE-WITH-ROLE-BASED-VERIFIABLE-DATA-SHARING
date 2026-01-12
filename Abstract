@@ -1,0 +1,14 @@
+Abstract
+
+Cloud computing provides high performance, accessibility and low cost for data storing and sharing, provides a better consumption of resources. However, security concerns develop the main constraint as now outsource the storage of data, which is possibly sensitive, to cloud providers. To preserve data privacy, a mutual approach is to encrypt data files before the clients upload the encrypted data into the cloud.
+Cloud storage services can help clients reduce their monetary and maintenance overhead of data managements. Data confidentiality becomes the main concern in outsourcing client data to cloud storages. There is also an essential for an access control mechanism for preventing data mistreatment within the organization. 
+Unfortunately, it is difficult to design a secure and efficient data sharing scheme, especially for dynamic groups in the cloud. To overcome the problem, here propose a secure data sharing scheme for frequently changed groups. First, propose Role Based Access Control (RBAC) with a protected way for key distribution without any secure communication channels, and the users can securely obtain their group keys from group manager. Role-based access control (RBAC) is one of the familiar access control model which provides flexible controls and database management by having users mapped to roles and roles mapped to privileges on data objects.The proposed solution is to make use of the emerging technology of blockchain to data storage. 
+First, define the system model of blockchain-based data storage with block and hash creation in the setting of blockchain. In this work, an ECC based encryption scheme is proposed which incorporates the cryptographic approaches with RBAC and also an anonymous control scheme to address the privacy in data as well as the user identity privacy in current access control schemes. If the group member can be revoked means, automatically change public keys of existing group and no need encrypt again the original data. Any user in the group can use the source in the cloud and revoked users cannot access the cloud again after they are revoked.
+
+
+
+Keywords: 
+
+Cloud computing, data privacy, data confidentiality, secure data sharing, role-based access control (RBAC), blockchain, elliptic curve cryptography (ECC), access control, key distribution, dynamic groups, group management, user revocation, encryption, identity privacy.
+
+
