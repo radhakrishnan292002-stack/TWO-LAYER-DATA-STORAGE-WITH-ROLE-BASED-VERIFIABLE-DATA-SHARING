@@ -1,237 +1,684 @@
-from flask import Flask, render_template, request, flash, session
+Main:
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash
 import mysql.connector
-import random
-import os
-
+from ecies.utilsimport generate_key
+from eciesimport encrypt, decrypt
+import base64, os
 app = Flask(__name__)
-app.secret_key = "secretkey"
+app.secret_key = &#39;a&#39;
 
+@app.route(&#39;/&#39;)
+def home():
+return render_template(&#39;index.html&#39;)
 
-# ------------------ BASIC PAGES ------------------
+@app.route(&#39;/ServerLogin&#39;)
+def ServerLogin():
+return render_template(&#39;ServerLogin.html&#39;)
 
-@app.route('/NewUser')
+@app.route(&#39;/CloudServerLogin&#39;)
+def CloudServerLogin():
+return render_template(&#39;CloudServerLogin.html&#39;)
+
+@app.route(&#39;/OwnerLogin&#39;)
+def OwnerLogin():
+return render_template(&#39;OwnerLogin.html&#39;)
+
+@app.route(&#39;/UserLogin&#39;)
+def UserLogin():
+return render_template(&#39;UserLogin.html&#39;)
+
+@app.route(&#39;/NewOwner&#39;)
+def NewOwner():
+return render_template(&#39;NewOwner.html&#39;)
+
+@app.route(&#39;/NewUser&#39;)
 def NewUser():
-    return render_template('NewUser.html')
+return render_template(&#39;NewUser.html&#39;)
 
-
-@app.route('/TALogin')
+@app.route(&#39;/TALogin&#39;)
 def TALogin():
-    return render_template('TALogin.html')
+return render_template(&#39;TALogin.html&#39;)
 
-
-# ------------------ SERVER LOGIN ------------------
-
-@app.route("/serverlogin", methods=['GET', 'POST'])
+@app.route(&quot;/serverlogin&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
 def serverlogin():
-    if request.method == 'POST':
-        if request.form['uname'] == 'server' and request.form['password'] == 'server':
+if request.method == &#39;POST&#39;:
+if request.form[&#39;uname&#39;] == &#39;server&#39; and request.form[&#39;password&#39;] == &#39;server&#39;:
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb &quot;)
+data = cur.fetchall()
+return render_template(&#39;ServerHome.html&#39;, data=data)
+else:
+flash(&#39;Username or Password is wrong&#39;)
+return render_template(&#39;ServerLogin.html&#39;)
 
-            conn = mysql.connector.connect(
-                user='root',
-                password='',
-                host='localhost',
-                database='1rolebasedclouddb'
-            )
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM ownertb")
-            data = cur.fetchall()
-            conn.close()
-
-            return render_template('ServerHome.html', data=data)
-        else:
-            flash('Username or Password is wrong')
-
-    return render_template('ServerLogin.html')
-
-
-@app.route("/fserverlogin", methods=['GET', 'POST'])
+@app.route(&quot;/fserverlogin&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
 def fserverlogin():
-    if request.method == 'POST':
-        if request.form['uname'] == 'server' and request.form['password'] == 'server':
+if request.method == &#39;POST&#39;:
+if request.form[&#39;uname&#39;] == &#39;server&#39; and request.form[&#39;password&#39;] == &#39;server&#39;:
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM filetb &quot;)
+data = cur.fetchall()
+return render_template(&#39;CloudServerHome.html&#39;, data=data)
+else:
+flash(&#39;Username or Password is wrong&#39;)
+return render_template(&#39;CloudServerLogin.html&#39;)
 
-            conn = mysql.connector.connect(
-                user='root',
-                password='',
-                host='localhost',
-                database='1rolebasedclouddb'
-            )
-            cur = conn.cursor()
-            cur.execute("SELECT * FROM filetb")
-            data = cur.fetchall()
-            conn.close()
+@app.route(&quot;/CloudServerHome&quot;)
+def CloudServerHome():
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM filetb &quot;)
+data = cur.fetchall()
+return render_template(&#39;CloudServerHome.html&#39;, data=data)
 
-            return render_template('CloudServerHome.html', data=data)
-        else:
-            flash('Username or Password is wrong')
+@app.route(&quot;/pkglogin&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def pkglogin():
+if request.method == &#39;POST&#39;:
+if request.form[&#39;uname&#39;] == &#39;admin&#39; and request.form[&#39;password&#39;] == &#39;admin&#39;:
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb where status=&#39;waiting&#39;&quot;)
+data = cur.fetchall()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb where status=&#39;Active&#39;&quot;)
+data1 = cur.fetchall()
+return render_template(&#39;TAHome.html&#39;, data=data, data1=data1)
+else:
+flash(&#39;Username or Password is wrong&#39;)
+return render_template(&#39;TAHome.html&#39;)
 
-    return render_template('CloudServerLogin.html')
+@app.route(&quot;/ServerHome&quot;)
+def ServerHome():
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb &quot;)
+data = cur.fetchall()
+return render_template(&#39;ServerHome.html&#39;, data=data)
 
-
-# ------------------ SERVER INFO ------------------
-
-@app.route('/SUserInfo')
+@app.route(&quot;/SUserInfo&quot;)
 def SUserInfo():
-    conn = mysql.connector.connect(
-        user='root',
-        password='',
-        host='localhost',
-        database='1rolebasedclouddb'
-    )
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM regtb")
-    data = cur.fetchall()
-    conn.close()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM regtb &quot;)
+data = cur.fetchall()
+return render_template(&#39;SUserInfo.html&#39;, data=data)
 
-    return render_template('SUserInfo.html', data=data)
-
-
-@app.route('/SFileInfo')
+@app.route(&#39;/SFileInfo&#39;)
 def SFileInfo():
-    conn = mysql.connector.connect(
-        user='root',
-        password='',
-        host='localhost',
-        database='1rolebasedclouddb'
-    )
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM filetb")
-    data1 = cur.fetchall()
-    conn.close()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM filetb &quot;)
+data1 = cur.fetchall()
+return render_template(&#39;SFileInfo.html&#39;, data=data1)
 
-    return render_template('SFileInfo.html', data=data1)
-
-
-# ------------------ APPROVE OWNER ------------------
-
-@app.route("/Approved")
+@app.route(&quot;/Approved&quot;)
 def Approved():
-    id = request.args.get('lid')
-    email = request.args.get('email')
+id = request.args.get(&#39;lid&#39;)
+email = request.args.get(&#39;email&#39;)
+import random
+loginkey = random.randint(1111, 9999)
+message = &quot;Owner Login Key :&quot; + str(loginkey)
+sendmail(email, message)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;Update ownertb set Status=&#39;Active&#39;,LoginKey=&#39;&quot; + str(loginkey) + &quot;&#39; where
+id=&#39;&quot; + id + &quot;&#39; &quot;)
+conn.commit()
+conn.close()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb where status=&#39;waiting&#39;&quot;)
+data = cur.fetchall()
 
-    loginkey = random.randint(1111, 9999)
-    message = "Owner Login Key : " + str(loginkey)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb where status=&#39;Active&#39;&quot;)
+data1 = cur.fetchall()
+return render_template(&#39;TAHome.html&#39;, data=data, data1=data1)
 
-    sendmail(email, message)
+@app.route(&quot;/Reject&quot;)
+def Reject():
+id = request.args.get(&#39;lid&#39;)
+email = request.args.get(&#39;email&#39;)
+message = &quot;Your Request Rejected&quot;
+sendmail(email, message)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;Update ownertb set Status=&#39;reject&#39; where id=&#39;&quot; + id + &quot;&#39; &quot;)
+conn.commit()
+conn.close()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb where status=&#39;waiting&#39;&quot;)
+data = cur.fetchall()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb where status !=&#39;waiting&#39;&quot;)
+data1 = cur.fetchall()
+return render_template(&#39;TAHome.html&#39;, data=data, data1=data1)
 
-    conn = mysql.connector.connect(
-        user='root',
-        password='',
-        host='localhost',
-        database='1rolebasedclouddb'
-    )
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE ownertb SET Status='Active', LoginKey=%s WHERE id=%s",
-        (str(loginkey), id)
-    )
-    conn.commit()
-
-    cursor.execute("SELECT * FROM ownertb WHERE status='waiting'")
-    data = cursor.fetchall()
-    conn.close()
-
-    return render_template('ServerHome.html', data=data)
-
-
-# ------------------ NEW OWNER REGISTRATION ------------------
-
-@app.route("/newowner", methods=['GET', 'POST'])
+@app.route(&quot;/newowner&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
 def newowner():
-    if request.method == 'POST':
-        uname = request.form['uname']
-        mobile = request.form['mobile']
-        email = request.form['email']
-        address = request.form['address']
-        username = request.form['username']
-        password = request.form['password']
+if request.method == &#39;POST&#39;:
+uname = request.form[&#39;uname&#39;]
 
-        conn = mysql.connector.connect(
-            user='root',
-            password='',
-            host='localhost',
-            database='1rolebasedclouddb'
-        )
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM ownertb WHERE username=%s", (username,))
-        data = cursor.fetchone()
+mobile = request.form[&#39;mobile&#39;]
+email = request.form[&#39;email&#39;]
+address = request.form[&#39;address&#39;]
+username = request.form[&#39;username&#39;]
+password = request.form[&#39;password&#39;]
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * from ownertb where username=&#39;&quot; + username + &quot;&#39; &quot;)
+data = cursor.fetchone()
+if data is None:
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(
+&quot;INSERT INTO ownertb VALUES (&#39;&#39;,&#39;&quot; + uname + &quot;&#39;,&#39;&quot; + mobile + &quot;&#39;,&#39;&quot; + email + &quot;&#39;,&#39;&quot; +
+address + &quot;&#39;,&#39;&quot; + username + &quot;&#39;,&#39;&quot; + password + &quot;&#39;,&#39;waiting&#39;,&#39;&#39;)&quot;)
+conn.commit()
+conn.close()
+flash(&#39;Record Saved!&#39;)
+return render_template(&#39;NewOwner.html&#39;)
+else:
+flash(&#39;Already Register This UserName!&#39;)
+return render_template(&#39;NewOwner.html&#39;)
 
-        if data is None:
-            cursor.execute(
-                """INSERT INTO ownertb 
-                VALUES ('', %s, %s, %s, %s, %s, %s, 'waiting', '')""",
-                (uname, mobile, email, address, username, password)
-            )
-            conn.commit()
-            flash('Record Saved!')
-        else:
-            flash('Already Registered Username!')
-
-        conn.close()
-
-    return render_template('NewOwner.html')
-
-
-# ------------------ OWNER LOGIN ------------------
-
-@app.route("/ownerlogin", methods=['GET', 'POST'])
+@app.route(&quot;/ownerlogin&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
 def ownerlogin():
-    if request.method == 'POST':
-        username = request.form['uname']
-        password = request.form['password']
-        loginkey = request.form['loginkey']
+if request.method == &#39;POST&#39;:
+username = request.form[&#39;uname&#39;]
+password = request.form[&#39;password&#39;]
+loginkey = request.form[&#39;loginkey&#39;]
+session[&#39;oname&#39;] = request.form[&#39;uname&#39;]
+session[&#39;lk&#39;] = loginkey
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * from ownertb where username=&#39;&quot; + username + &quot;&#39; and
+Password=&#39;&quot; + password + &quot;&#39; &quot;)
+data = cursor.fetchone()
 
-        session['oname'] = username
+if data is None:
+flash(&#39;Username or Password is wrong&#39;)
+return render_template(&#39;OwnerLogin.html&#39;)
+else:
+Status = data[7]
+lkey = data[8]
+print(lkey)
+if Status == &quot;waiting&quot;:
+flash(&#39;Waiting For Server Approved!&#39;)
+return render_template(&#39;OwnerLogin.html&#39;)
+else:
+if lkey == loginkey:
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb where username=&#39;&quot; + session[&#39;oname&#39;] + &quot;&#39;&quot;)
+data1 = cur.fetchall()
+return render_template(&#39;OwnerHome.html&#39;, data=data1)
+else:
+flash(&#39;Login Key Incorrect&#39;)
+return render_template(&#39;OwnerLogin.html&#39;)
 
-        conn = mysql.connector.connect(
-            user='root',
-            password='',
-            host='localhost',
-            database='1rolebasedclouddb'
-        )
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT * FROM ownertb WHERE username=%s AND password=%s",
-            (username, password)
-        )
-        data = cursor.fetchone()
-        conn.close()
-
-        if data is None:
-            flash('Username or Password is wrong')
-            return render_template('OwnerLogin.html')
-
-        status = data[7]
-        lkey = data[8]
-
-        if status == "waiting":
-            flash('Waiting For Server Approval!')
-            return render_template('OwnerLogin.html')
-
-        if str(lkey) == loginkey:
-            return redirect('/OwnerHome')
-        else:
-            flash('Login Key Incorrect')
-            return render_template('OwnerLogin.html')
-
-    return render_template('OwnerLogin.html')
-
-
-# ------------------ OWNER HOME ------------------
-
-@app.route('/OwnerHome')
+@app.route(&#39;/OwnerHome&#39;)
 def OwnerHome():
-    conn = mysql.connector.connect(
-        user='root',
-        password='',
-        host='localhost',
-        database='1rolebasedclouddb'
-    )
-    cur = conn.cursor()
-    cur.execute(
-        "SELECT * FROM ownertb WHERE username=%s",
-        (session['oname'],)
-    )
-    data1 = cur.fetchall()
-    conn.close()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM ownertb where username=&#39;&quot; + session[&#39;oname&#39;] + &quot;&#39;&quot;)
+data1 = cur.fetchall()
+return render_template(&#39;OwnerHome.html&#39;, data=data1)
 
-    return render_template('OwnerHome.html', data=data1)
+@app.route(&quot;/newuser&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def newuser():
+if request.method == &#39;POST&#39;:
+
+uname = request.form[&#39;uname&#39;]
+mobile = request.form[&#39;mobile&#39;]
+email = request.form[&#39;email&#39;]
+address = request.form[&#39;address&#39;]
+username = request.form[&#39;username&#39;]
+password = request.form[&#39;password&#39;]
+oname = session[&#39;oname&#39;]
+loginkey = session[&#39;lk&#39;]
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * from regtb where username=&#39;&quot; + username + &quot;&#39; &quot;)
+data = cursor.fetchone()
+if data is None:
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(
+&quot;INSERT INTO regtb VALUES (&#39;&#39;,&#39;&quot; + uname + &quot;&#39;,&#39;&quot; + mobile + &quot;&#39;,&#39;&quot; + email + &quot;&#39;,&#39;&quot; + address
++ &quot;&#39;,&#39;&quot; +
+username + &quot;&#39;,&#39;&quot; + password + &quot;&#39;,&#39;Active&#39;,&#39;&quot; + loginkey + &quot;&#39;,&#39;&quot; + oname + &quot;&#39;)&quot;)
+conn.commit()
+conn.close()
+message = &quot;username: &quot; + username + &quot; Password: &quot; + password + &quot; loginkey: &quot; +
+loginkey
+sendmail(email, message)
+flash(&#39;Record Saved!&#39;)
+return render_template(&#39;NewUser.html&#39;)
+else:
+flash(&#39;Already Register This UserName!&#39;)
+return render_template(&#39;NewUser.html&#39;)
+
+@app.route(&#39;/OwnerFileUpload&#39;)
+def OwnerFileUpload():
+return render_template(&#39;OwnerFileUpload.html&#39;, oname=session[&#39;oname&#39;])
+
+import hmac
+import hashlib
+import binascii
+
+def create_sha256_signature(key, message):
+byte_key = binascii.unhexlify(key)
+message = message.encode()
+return hmac.new(byte_key, message, hashlib.sha256).hexdigest().upper()
+
+import pyAesCrypt
+import random
+import string
+
+def randStr(chars=string.ascii_uppercase + string.digits, N=10):
+return &#39;&#39;.join(random.choice(chars) for _ in range(N))
+
+def encrypt(key, source, des):
+output = des
+pyAesCrypt.encryptFile(source, output, key)
+return output
+
+def decrypt(key, source, des):
+dfile= source.split(&quot;.&quot;)
+output = des
+pyAesCrypt.decryptFile(source, output, key)
+return output
+
+@app.route(&quot;/owfileupload&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def owfileupload():
+if request.method == &#39;POST&#39;:
+oname = session[&#39;oname&#39;]
+info = request.form[&#39;info&#39;]
+file = request.files[&#39;file&#39;]
+import random
+fnew = random.randint(111, 999)
+savename = str(fnew) + file.filename
+file.save(&quot;static/upload/&quot; + savename)
+filepath = &quot;./static/upload/&quot; + savename
+
+head, tail = os.path.split(filepath)
+newfilepath1 = &#39;./static/upload/&#39; + str(tail)
+newfilepath2 = &#39;./static/Encrypt/&#39; + str(tail)
+pubhex = randStr(chars=&#39;abcdef123456&#39;)
+key = pubhex
+encrypt(key, newfilepath1, newfilepath2)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * FROM filetb &quot;)
+data2 = cursor.fetchone()
+if data2:
+conn1 = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor1 = conn1.cursor()
+cursor1.execute(&quot;select max(id) from filetb&quot;)
+da = cursor1.fetchone()
+if da:
+d = da[0]
+print(d)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * FROM filetb where id =&#39;&quot; + str(d) + &quot;&#39; &quot;)
+data1 = cursor.fetchone()
+if data1:
+hash1 = data1[6]
+num1 = random.randrange(1111, 9999)
+hash2 = create_sha256_signature(&quot;E49756B4C8FAB4E48222A3E7F3B97CC3&quot;,
+str(num1))
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(
+&quot;INSERT INTO filetb VALUES (&#39;&#39;,&#39;&quot; + oname + &quot;&#39;,&#39;&quot; + info + &quot;&#39;,&#39;&quot; + savename + &quot;&#39;,&#39;&quot; +
+pubhex + &quot;&#39;,&#39;&quot; +
+hash1 + &quot;&#39;,&#39;&quot; + hash2 + &quot;&#39;)&quot;)
+
+conn.commit()
+conn.close()
+flash(&#39;File Upload And Encrypt Successfully &#39;)
+return render_template(&#39;OwnerFileUpload.html&#39;, pkey=pubhex, oname=oname)
+else:
+hash1 = &#39;0&#39;
+num1 = random.randrange(1111, 9999)
+hash2 = create_sha256_signature(&quot;E49756B4C8FAB4E48222A3E7F3B97CC3&quot;,
+str(num1))
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(
+&quot;INSERT INTO filetb VALUES (&#39;&#39;,&#39;&quot; + oname + &quot;&#39;,&#39;&quot; + info + &quot;&#39;,&#39;&quot; + savename + &quot;&#39;,&#39;&quot; +
+pubhex + &quot;&#39;,&#39;&quot; + hash1 + &quot;&#39;,&#39;&quot; + hash2 + &quot;&#39;)&quot;)
+conn.commit()
+conn.close()
+flash(&#39;File Upload And Encrypt Successfully &#39;)
+return render_template(&#39;OwnerFileUpload.html&#39;, pkey=pubhex, oname=oname)
+
+@app.route(&#39;/OwnerFileInfo&#39;)
+def OwnerFileInfo():
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM filetb where OwnerName=&#39;&quot; + session[&#39;oname&#39;] + &quot;&#39;&quot;)
+data1 = cur.fetchall()
+return render_template(&#39;OwnerFileInfo.html&#39;, data=data1)
+
+@app.route(&quot;/ODownload&quot;)
+def ODownload():
+fid = request.args.get(&#39;fid&#39;)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * FROM filetb where id=&#39;&quot; + fid + &quot;&#39;&quot;)
+data = cursor.fetchone()
+if data:
+prkey = data[4]
+
+fname = data[3]
+else:
+return &#39;Incorrect username / password !&#39;
+privhex = prkey
+filepath = &quot;./static/Encrypt/&quot; + fname
+head, tail = os.path.split(filepath)
+newfilepath1 = &#39;./static/Encrypt/&#39; + str(tail)
+newfilepath2 = &#39;./static/Decrypt/&#39; + str(tail)
+decrypt(privhex, newfilepath1, newfilepath2)
+return send_file(newfilepath2, as_attachment=True)
+
+@app.route(&quot;/OwnerFileApproved&quot;)
+def OwnerFileApproved():
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb where status=&#39;waiting&#39; and OwnerName=&#39;&quot; +
+session[&#39;oname&#39;] + &quot;&#39; &quot;)
+data = cur.fetchall()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb where status=&#39;Approved&#39; and OwnerName=&#39;&quot; +
+session[&#39;oname&#39;] + &quot;&#39; &quot;)
+data1 = cur.fetchall()
+return render_template(&#39;OwnerFileApproved.html&#39;, data=data, data1=data1)
+
+@app.route(&quot;/OApproved&quot;)
+def OApproved():
+rid = request.args.get(&#39;rid&#39;)
+fid = request.args.get(&#39;fid&#39;)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+
+cursor.execute(&quot;SELECT * FROM userfiletb where id=&#39;&quot; + rid + &quot;&#39;&quot;)
+data = cursor.fetchone()
+if data:
+prkey = data[4]
+UserName = data[5]
+else:
+return &#39;Incorrect username / password !&#39;
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * FROM regtb where UserName=&#39;&quot; + UserName + &quot;&#39;&quot;)
+data1 = cursor.fetchone()
+if data1:
+session[&quot;email&quot;] = data1[3]
+else:
+return &#39;Incorrect username / password !&#39;
+mailmsg = &quot;Request Id&quot; + rid + &quot;\nDecryptkey: &quot; + prkey
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;update userfiletb set Status=&#39;Approved&#39; where id=&#39;&quot; +
+rid + &quot;&#39;&quot;)
+conn.commit()
+conn.close()
+sendmail(session[&quot;email&quot;], mailmsg)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb where status=&#39;waiting&#39; and OwnerName=&#39;&quot; +
+session[&#39;oname&#39;] + &quot;&#39; &quot;)
+data = cur.fetchall()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb where status=&#39;Approved&#39; and OwnerName=&#39;&quot; +
+session[&#39;oname&#39;] + &quot;&#39; &quot;)
+data1 = cur.fetchall()
+return render_template(&#39;OwnerFileApproved.html&#39;, data=data, data1=data1)
+
+@app.route(&quot;/UDownload&quot;)
+def UDownload():
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb where status=&#39;waiting&#39; and Username=&#39;&quot; +
+session[&#39;uname&#39;] + &quot;&#39; &quot;)
+data = cur.fetchall()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb where status=&#39;Approved&#39; and Username=&#39;&quot; +
+session[&#39;uname&#39;] + &quot;&#39; &quot;)
+data1 = cur.fetchall()
+return render_template(&#39;UDownload.html&#39;, data=data, data1=data1)
+
+@app.route(&quot;/userdownload&quot;)
+def userdownload():
+ufid = request.args.get(&#39;ufid&#39;)
+session[&quot;ufid&quot;] = ufid
+return render_template(&#39;UnHide.html&#39;)
+
+@app.route(&quot;/uddd&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def uddd():
+if request.method == &#39;POST&#39;:
+sear = request.form[&#39;dfk&#39;]
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * FROM userfiletb where id=&#39;&quot; + session[&quot;ufid&quot;] + &quot;&#39;&quot;)
+data = cursor.fetchone()
+if data:
+prkey = data[4]
+fname = data[3]
+
+else:
+return &#39;Incorrect username / password !&#39;
+
+if sear == prkey:
+filepath = &quot;./static/Encrypt/&quot; + fname
+head, tail = os.path.split(filepath)
+newfilepath1 = &#39;./static/Encrypt/&#39; + str(tail)
+newfilepath2 = &#39;./static/Decrypt/&#39; + str(tail)
+decrypt(prkey, newfilepath1, newfilepath2)
+return send_file(newfilepath2, as_attachment=True)
+else:
+flash(&#39;key Incorrect..!&#39;)
+return render_template(&#39;UserLogin.html&#39;)
+
+@app.route(&quot;/userlogin&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def userlogin():
+if request.method == &#39;POST&#39;:
+username = request.form[&#39;uname&#39;]
+password = request.form[&#39;password&#39;]
+loginkey = request.form[&#39;loginkey&#39;]
+session[&#39;uname&#39;] = request.form[&#39;uname&#39;]
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * from regtb where username=&#39;&quot; + username + &quot;&#39; and Password=&#39;&quot;
++ password + &quot;&#39; &quot;)
+data = cursor.fetchone()
+if data is None:
+flash(&#39;Username or Password is wrong&#39;)
+return render_template(&#39;UserLogin.html&#39;)
+else:
+Status = data[7]
+lkey = data[8]
+session[&#39;oname&#39;] = data[9]
+if Status == &quot;waiting&quot;:
+
+flash(&#39;Waiting For Server Approved!&#39;)
+return render_template(&#39;UserLogin.html&#39;)
+else:
+if lkey == loginkey:
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM regtb where username=&#39;&quot; + session[&#39;uname&#39;] + &quot;&#39;&quot;)
+data1 = cur.fetchall()
+flash(&#39;Login Successfully&#39;)
+return render_template(&#39;UserHome.html&#39;, data=data1)
+else:
+flash(&#39;Login Key Incorrect&#39;)
+return render_template(&#39;UserLogin.html&#39;)
+
+@app.route(&#39;/UserHome&#39;)
+def UserHome():
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM UserHome where OwnerName=&#39;&quot; + session[&#39;uname&#39;] + &quot;&#39;&quot;)
+data1 = cur.fetchall()
+return render_template(&#39;UserHome.html&#39;, data=data1)
+
+@app.route(&#39;/USearch&#39;)
+def USearch():
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM filetb where Ownername=&#39;&quot;+ session[&#39;oname&#39;] +&quot;&#39; &quot;)
+data1 = cur.fetchall()
+return render_template(&#39;USearch.html&#39;, data=data1)
+
+@app.route(&quot;/search&quot;, methods=[&#39;GET&#39;, &#39;POST&#39;])
+def search():
+if request.method == &#39;POST&#39;:
+sear = request.form[&#39;sear&#39;]
+
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(
+&quot;SELECT * FROM filetb where Ownername=&#39;&quot;+ session[&#39;oname&#39;] +&quot;&#39; and ( FileInfo like&#39;%&quot;
++ sear + &quot;%&#39; or FileName like &#39;%&quot; + sear + &quot;%&#39;) &quot;)
+data1 = cur.fetchall()
+return render_template(&#39;USearch.html&#39;, data=data1)
+
+@app.route(&quot;/SendKeyRequest&quot;)
+def SendKeyRequest():
+fid = request.args.get(&#39;fid&#39;)
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(&quot;SELECT * FROM filetb where id=&#39;&quot; + fid + &quot;&#39;&quot;)
+data = cursor.fetchone()
+if data:
+oname = data[1]
+fname = data[3]
+prkey = data[4]
+else:
+return &#39;Incorrect username / password !&#39;
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cursor = conn.cursor()
+cursor.execute(
+&quot;INSERT INTO userfiletb VALUES (&#39;&#39;,&#39;&quot; + fid + &quot;&#39;,&#39;&quot; + oname + &quot;&#39;,&#39;&quot; + fname + &quot;&#39;,&#39;&quot; + prkey
++ &quot;&#39;,&#39;&quot; + session[
+&#39;uname&#39;] + &quot;&#39;,&#39;waiting&#39;)&quot;)
+conn.commit()
+conn.close()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb where status=&#39;waiting&#39; and username=&#39;&quot; +
+session[&#39;uname&#39;] + &quot;&#39; &quot;)
+
+data = cur.fetchall()
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb where status=&#39;Approved&#39; and username=&#39;&quot; +
+session[&#39;uname&#39;] + &quot;&#39; &quot;)
+data1 = cur.fetchall()
+return render_template(&#39;UDownload.html&#39;, data=data, data1=data1)
+
+@app.route(&#39;/SRequestInfo&#39;)
+def SRequestInfo():
+conn = mysql.connector.connect(user=&#39;root&#39;, password=&#39;&#39;, host=&#39;localhost&#39;,
+database=&#39;1rolebasedclouddb&#39;)
+cur = conn.cursor()
+cur.execute(&quot;SELECT * FROM userfiletb &quot;)
+data1 = cur.fetchall()
+return render_template(&#39;SRequestInfo.html&#39;, data=data1)
+def sendmail(Mailid, message):
+import smtplib
+from email.mime.multipartimport MIMEMultipart
+from email.mime.textimport MIMEText
+from email.mime.baseimport MIMEBase
+from email import encoders
+fromaddr = &quot;projectmailm@gmail.com&quot;
+toaddr = Mailid
+# instance of MIMEMultipart
+msg = MIMEMultipart()
+# storing the senders email address
+msg[&#39;From&#39;] = fromaddr
+# storing the receivers email address
+msg[&#39;To&#39;] = toaddr
+# storing the subject
+msg[&#39;Subject&#39;] = &quot;Alert&quot;
+# string to store the body of the mail
+body = message
+
+# attach the body with the msg instance
+msg.attach(MIMEText(body, &#39;plain&#39;))
+# creates SMTP session
+s = smtplib.SMTP(&#39;smtp.gmail.com&#39;, 587)
+# start TLS for security
+s.starttls()
+# Authentication
+s.login(fromaddr, &quot;qmgnxeclbkqvmusr&quot;)
+# Converts the Multipart msg into a string
+text = msg.as_string()
+# sending the mail
+s.sendmail(fromaddr, toaddr, text)
+# terminating the session
+s.quit()
+
+if __name__ == &#39;__main__&#39;:
+# app.run(host=&#39;0.0.0.0&#39;, debug=True, port=5000)
+app.run(debug=True, use_reloader=True)
