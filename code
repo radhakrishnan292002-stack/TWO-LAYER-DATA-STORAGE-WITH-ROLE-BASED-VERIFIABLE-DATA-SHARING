@@ -1,8 +1,8 @@
 Main:
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash
 import mysql.connector
-from ecies.utilsimport generate_key
-from eciesimport encrypt, decrypt
+from ecies.utils import generate_key
+from ecies import encrypt, decrypt
 import base64, os
 app = Flask(__name__)
 app.secret_key = &#39;a&#39;
